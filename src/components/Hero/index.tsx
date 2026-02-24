@@ -1,3 +1,7 @@
+import { useDispatch, useSelector } from 'react-redux'
+import { RootReducer } from '../../store'
+import { open } from '../../store/reducers/cart'
+
 import Logo from '../Logo'
 
 import {
@@ -17,13 +21,22 @@ type HeroProps = {
 }
 
 const Hero = ({ textContent, title }: HeroProps) => {
+  const { items } = useSelector((state: RootReducer) => state.cart)
+  const dispatch = useDispatch()
+
+  function handleOpenCart() {
+    dispatch(open())
+  }
+
   function renderHeaderContent(item: string | undefined) {
     if (item && item !== undefined) {
       return (
         <>
           <TitleLink to="/">{item}</TitleLink>
           <Logo kind="link" cover={LogoImage} title="Logo eFood" to="/" />
-          <Title>0 produto(s) no carrinho</Title>
+          <Title onClick={handleOpenCart}>
+            {items.length} produto(s) no carrinho
+          </Title>
         </>
       )
     }
