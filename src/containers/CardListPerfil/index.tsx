@@ -27,7 +27,7 @@ const CardListPerfil = ({ onModalOpenChange }: CardListPerilProps) => {
   const { id } = useParams()
 
   useEffect(() => {
-    fetch(`https://fake-api-tau.vercel.app/api/efood/restaurantes/${id}`)
+    fetch(`https://api-ebac.vercel.app/api/efood/restaurantes/${id}`)
       .then((res) => res.json())
       .then((res) => setData(res))
   }, [id])
