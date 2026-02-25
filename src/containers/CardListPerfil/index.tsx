@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { MenuDataProps, RestaurantsDataProps } from '../CardListHome'
 import { getDescriptionProduct } from '../../utils'
 import Card from '../../components/Card'
 import Modal from '../../components/Modal'
+import { getRestaurantById, MenuDataProps } from '../../utils/restaurants'
 
 import {
   BannerContainer,
@@ -20,17 +20,11 @@ type CardListPerilProps = {
 }
 
 const CardListPerfil = ({ onModalOpenChange }: CardListPerilProps) => {
-  const [data, setData] = useState<RestaurantsDataProps>()
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null)
   const [openModal, setOpenModal] = useState(false)
 
   const { id } = useParams()
-
-  useEffect(() => {
-    fetch(`https://api-ebac.vercel.app/api/efood/restaurantes/${id}`)
-      .then((res) => res.json())
-      .then((res) => setData(res))
-  }, [id])
+  const data = getRestaurantById(Number(id))
 
   function handleCardClick(itemId: number) {
     setSelectedItemId(itemId)
@@ -88,7 +82,7 @@ const CardListPerfil = ({ onModalOpenChange }: CardListPerilProps) => {
     )
   }
 
-  if (!data) return <h3>Carregando...</h3>
+  if (!data) return <h3>Restaurante não encontrado</h3>
 
   return (
     <ContainerListPerfil>

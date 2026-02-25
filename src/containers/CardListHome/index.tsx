@@ -1,43 +1,14 @@
-import { useEffect, useState } from 'react'
-
 import Card from '../../components/Card'
 
 import { CardListContainer } from './styles'
 import Star from '../../assets/icons/star.svg'
 import { getDescription } from '../../utils'
-
-export type MenuDataProps = {
-  id: number
-  nome: string
-  descricao: string
-  foto: string
-  porcao: string
-  preco: number
-}
-
-export type RestaurantsDataProps = {
-  id: number
-  titulo: string
-  avaliacao: string
-  destacado: boolean
-  tipo: string
-  descricao: string
-  capa: string
-  cardapio: MenuDataProps[]
-}
+import { restaurantsData, RestaurantsDataProps } from '../../utils/restaurants'
 
 const CardListHome = () => {
-  const [data, setData] = useState([])
-
-  useEffect(() => {
-    fetch(`https://api-ebac.vercel.app/api/efood/restaurantes`)
-      .then((res) => res.json())
-      .then((res) => setData(res))
-  }, [])
-
   return (
     <CardListContainer>
-      {data.map((item: RestaurantsDataProps) => (
+      {restaurantsData.map((item: RestaurantsDataProps) => (
         <>
           <Card
             key={item.id}
