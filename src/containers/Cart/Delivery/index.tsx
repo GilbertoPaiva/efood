@@ -47,10 +47,26 @@ const Delivery = ({ handleClick }: DeliveryProps) => {
       description: Yup.string().required('O campo é obrigatório'),
       city: Yup.string().required('O campo é obrigatório'),
       zipCode: Yup.string()
-        .min(8, 'O nome precisa ter pelo menos 8 caracteres')
-        .max(8, 'O campo precisa ter pelo menos 8 caracteres')
+        .matches(/^\d{5}-\d{3}$/, 'CEP inválido')
         .required('O campo é obrigatório'),
-      number: Yup.number().required('O campo é obrigatório')
+      number: Yup.number()
+        .min(1, 'Informe o número')
+        .required('O campo é obrigatório'),
+      name: Yup.string()
+        .min(5, 'O nome precisa ter pelo menos 5 caracteres')
+        .required('O campo é obrigatório'),
+      cardNumber: Yup.string()
+        .matches(/^\d{4} \d{4} \d{4} \d{4}$/, 'Número do cartão inválido')
+        .required('O campo é obrigatório'),
+      code: Yup.string()
+        .matches(/^\d{3}$/, 'CVV inválido')
+        .required('O campo é obrigatório'),
+      month: Yup.string()
+        .matches(/^\d{2}$/, 'Mês inválido')
+        .required('O campo é obrigatório'),
+      year: Yup.string()
+        .matches(/^\d{2}$/, 'Ano inválido')
+        .required('O campo é obrigatório')
     }),
     onSubmit: (values) => {
       purchase({
@@ -205,6 +221,8 @@ const Delivery = ({ handleClick }: DeliveryProps) => {
             name="name"
             value={form.values.name}
             onChange={form.handleChange}
+            onBlur={form.handleBlur}
+            className={checkInputHasError('name') ? 'error' : ''}
           />
         </S.InputGroup>
         <S.InputContainer>
@@ -216,6 +234,8 @@ const Delivery = ({ handleClick }: DeliveryProps) => {
               name="cardNumber"
               value={form.values.cardNumber}
               onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              className={checkInputHasError('cardNumber') ? 'error' : ''}
               mask="9999 9999 9999 9999"
             />
           </S.InputGroup>
@@ -227,6 +247,8 @@ const Delivery = ({ handleClick }: DeliveryProps) => {
               name="code"
               value={form.values.code}
               onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              className={checkInputHasError('code') ? 'error' : ''}
               mask="999"
             />
           </S.InputGroup>
@@ -240,6 +262,8 @@ const Delivery = ({ handleClick }: DeliveryProps) => {
               name="month"
               value={form.values.month}
               onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              className={checkInputHasError('month') ? 'error' : ''}
               mask="99"
             />
           </S.InputGroup>
@@ -251,6 +275,8 @@ const Delivery = ({ handleClick }: DeliveryProps) => {
               name="year"
               value={form.values.year}
               onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              className={checkInputHasError('year') ? 'error' : ''}
               mask="99"
             />
           </S.InputGroup>
@@ -350,7 +376,24 @@ const Delivery = ({ handleClick }: DeliveryProps) => {
               displayMode="fullWidth"
               themeMode="second"
               kind="button"
-              onClick={() => setFinalizePayment(true)}
+              onClick={() => {
+                const deliveryFields = [
+                  'receiver',
+                  'description',
+                  'city',
+                  'zipCode',
+                  'number'
+                ]
+                deliveryFields.forEach((field) => form.setFieldTouched(field))
+                form.validateForm().then((errors) => {
+                  const hasDeliveryErrors = deliveryFields.some(
+                    (field) => field in errors
+                  )
+                  if (!hasDeliveryErrors) {
+                    setFinalizePayment(true)
+                  }
+                })
+              }}
             />
           )}
 
