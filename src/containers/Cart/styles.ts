@@ -128,10 +128,18 @@ export const InputGroup = styled.div<InputGroupProps>`
     border: 1px solid ${theme.Colors.primary};
 
     &.error {
-      border: 1px solid red;
+      border: 2px solid red;
       color: red;
     }
   }
+`
+
+export const ErrorMessage = styled.small`
+  color: ${theme.Colors.white};
+  font-size: 11px;
+  font-weight: 700;
+  display: block;
+  margin-top: 4px;
 `
 
 export const InputContainer = styled.div`

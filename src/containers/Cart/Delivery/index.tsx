@@ -63,10 +63,36 @@ const Delivery = ({ handleClick }: DeliveryProps) => {
         .required('O campo é obrigatório'),
       month: Yup.string()
         .matches(/^\d{2}$/, 'Mês inválido')
+        .test('month-range', 'Mês inválido', (value) => {
+          if (!value || !/^\d{2}$/.test(value)) return false
+          const month = parseInt(value, 10)
+          return month >= 1 && month <= 12
+        })
         .required('O campo é obrigatório'),
       year: Yup.string()
         .matches(/^\d{2}$/, 'Ano inválido')
+        .test('year-min', 'Ano inválido', (value) => {
+          if (!value || !/^\d{2}$/.test(value)) return false
+          const currentYear = new Date().getFullYear() % 100
+          return parseInt(value, 10) >= currentYear
+        })
         .required('O campo é obrigatório')
+    }).test('card-expiry', 'Cartão vencido', function (values) {
+      const { month, year } = values
+      if (!month || !year || !/^\d{2}$/.test(month) || !/^\d{2}$/.test(year))
+        return true
+      const now = new Date()
+      const currentYear = now.getFullYear() % 100
+      const currentMonth = now.getMonth() + 1
+      const cardYear = parseInt(year, 10)
+      const cardMonth = parseInt(month, 10)
+      if (cardYear === currentYear && cardMonth < currentMonth) {
+        return this.createError({
+          path: 'month',
+          message: 'Mês já expirado para o ano informado'
+        })
+      }
+      return true
     }),
     onSubmit: (values) => {
       purchase({
@@ -118,6 +144,12 @@ const Delivery = ({ handleClick }: DeliveryProps) => {
     return hasError
   }
 
+  function getErrorMessage(fieldName: string) {
+    if (!checkInputHasError(fieldName)) return null
+    const message = form.errors[fieldName as keyof typeof form.values] as string
+    return <S.ErrorMessage>{message}</S.ErrorMessage>
+  }
+
   function renderFormSubTitle() {
     if (finalizePayment) {
       return (
@@ -144,6 +176,7 @@ const Delivery = ({ handleClick }: DeliveryProps) => {
             onBlur={form.handleBlur}
             className={checkInputHasError('receiver') ? 'error' : ''}
           />
+          {getErrorMessage('receiver')}
         </S.InputGroup>
         <S.InputGroup>
           <label htmlFor="description">Endereço</label>
@@ -156,6 +189,7 @@ const Delivery = ({ handleClick }: DeliveryProps) => {
             onBlur={form.handleBlur}
             className={checkInputHasError('description') ? 'error' : ''}
           />
+          {getErrorMessage('description')}
         </S.InputGroup>
         <S.InputGroup>
           <label htmlFor="city">Cidade</label>
@@ -168,6 +202,7 @@ const Delivery = ({ handleClick }: DeliveryProps) => {
             onBlur={form.handleBlur}
             className={checkInputHasError('city') ? 'error' : ''}
           />
+          {getErrorMessage('city')}
         </S.InputGroup>
         <S.InputContainer>
           <S.InputGroup>
@@ -182,6 +217,7 @@ const Delivery = ({ handleClick }: DeliveryProps) => {
               onBlur={form.handleBlur}
               className={checkInputHasError('zipCode') ? 'error' : ''}
             />
+            {getErrorMessage('zipCode')}
           </S.InputGroup>
           <S.InputGroup>
             <label htmlFor="number">Número</label>
@@ -194,6 +230,7 @@ const Delivery = ({ handleClick }: DeliveryProps) => {
               onBlur={form.handleBlur}
               className={checkInputHasError('number') ? 'error' : ''}
             />
+            {getErrorMessage('number')}
           </S.InputGroup>
         </S.InputContainer>
         <S.InputGroup>
@@ -224,6 +261,7 @@ const Delivery = ({ handleClick }: DeliveryProps) => {
             onBlur={form.handleBlur}
             className={checkInputHasError('name') ? 'error' : ''}
           />
+          {getErrorMessage('name')}
         </S.InputGroup>
         <S.InputContainer>
           <S.InputGroup>
@@ -238,6 +276,7 @@ const Delivery = ({ handleClick }: DeliveryProps) => {
               className={checkInputHasError('cardNumber') ? 'error' : ''}
               mask="9999 9999 9999 9999"
             />
+            {getErrorMessage('cardNumber')}
           </S.InputGroup>
           <S.InputGroup>
             <label htmlFor="code">CVV</label>
@@ -251,6 +290,7 @@ const Delivery = ({ handleClick }: DeliveryProps) => {
               className={checkInputHasError('code') ? 'error' : ''}
               mask="999"
             />
+            {getErrorMessage('code')}
           </S.InputGroup>
         </S.InputContainer>
         <S.InputContainer>
@@ -266,6 +306,7 @@ const Delivery = ({ handleClick }: DeliveryProps) => {
               className={checkInputHasError('month') ? 'error' : ''}
               mask="99"
             />
+            {getErrorMessage('month')}
           </S.InputGroup>
           <S.InputGroup>
             <label htmlFor="year">Ano de vencimento</label>
@@ -279,6 +320,7 @@ const Delivery = ({ handleClick }: DeliveryProps) => {
               className={checkInputHasError('year') ? 'error' : ''}
               mask="99"
             />
+            {getErrorMessage('year')}
           </S.InputGroup>
         </S.InputContainer>
       </S.FormContainer>
